@@ -1,46 +1,71 @@
 package com.example.note.ui.dashboard;
 
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
-
+import androidx.room.Room;
 import com.example.note.R;
+import com.example.note.database.AppDatabase;
 import com.example.note.databinding.FragmentDashboardBinding;
+import com.example.note.models.Note;
+import org.jetbrains.annotations.NotNull;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
+
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class DashboardFragment extends Fragment {
-
-    private DashboardViewModel dashboardViewModel;
     private FragmentDashboardBinding binding;
+    private static final ConcurrentLinkedDeque<Note> notes = new ConcurrentLinkedDeque<>();
+    private AppDatabase appDatabase;
+    private LinearLayout linearLayout;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel =
-                new ViewModelProvider(this).get(DashboardViewModel.class);
-
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        appDatabase = Room.databaseBuilder(requireActivity().getApplicationContext(),
+                AppDatabase.class, AppDatabase.DB_NAME).build();
+        linearLayout = binding.list;
 
-        final TextView textView = binding.textDashboard;
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        return root;
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        Runnable runnable = () -> {
+            notes.addAll(appDatabase.noteDao().getAll());
+            addViews();
+        };
+
+        view.post(runnable);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    /**
+     * Adds views to fragment layout
+     */
+    private void addViews(){
+        for(Note note: notes){
+            LayoutInflater layoutInflater = (LayoutInflater) requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View view = layoutInflater.inflate(R.layout.list_item, linearLayout, false);
+
+            linearLayout.addView(view);
+            linearLayout.invalidate();
+        }
     }
 }
