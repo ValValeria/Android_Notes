@@ -13,7 +13,7 @@ public class Note {
     private String title;
 
     @ColumnInfo
-    private int time;
+    private long time;
 
     @ColumnInfo
     private String content;
@@ -37,11 +37,11 @@ public class Note {
         this.title = title;
     }
 
-    public int getTime() {
+    public long getTime() {
         return time;
     }
 
-    public void setTime(int time) {
+    public void setTime(long time) {
         this.time = time;
     }
 

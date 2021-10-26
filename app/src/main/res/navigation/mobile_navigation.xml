@@ -18,6 +18,12 @@
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
+        android:id="@+id/navigation_add_note"
+        android:name="com.example.note.ui.add_note.AddNoteFragment"
+        android:label="@string/title_dashboard"
+        tools:layout="@layout/fragment_add_note" />
+
+    <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.note.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"

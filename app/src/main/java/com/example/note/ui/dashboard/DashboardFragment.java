@@ -1,12 +1,14 @@
 package com.example.note.ui.dashboard;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,12 +44,14 @@ public class DashboardFragment extends Fragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Runnable runnable = () -> {
-            notes.addAll(appDatabase.noteDao().getAll());
-            addViews();
-        };
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                notes.addAll(appDatabase.noteDao().getAll());
 
-        view.post(runnable);
+                view.post(DashboardFragment.this::addViews);
+            }
+        });
     }
 
     @Override
@@ -64,8 +68,16 @@ public class DashboardFragment extends Fragment {
             LayoutInflater layoutInflater = (LayoutInflater) requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View view = layoutInflater.inflate(R.layout.list_item, linearLayout, false);
 
+            TextView textView = view.findViewById(R.id.text);
+            textView.setText(note.getTitle());
+
             linearLayout.addView(view);
             linearLayout.invalidate();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 }
