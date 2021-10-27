@@ -17,6 +17,14 @@
             android:padding="@dimen/space"
             >
             <TextView
+                style="@style/TextAppearance.MaterialComponents.Subtitle1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/title"
+                android:layout_marginBottom="@dimen/space_half"
+                />
+
+            <TextView
                 android:id="@+id/text"
                 style="@style/TextAppearance.MaterialComponents.Headline6"
                 android:layout_width="match_parent"

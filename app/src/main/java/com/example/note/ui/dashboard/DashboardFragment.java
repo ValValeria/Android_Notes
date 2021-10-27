@@ -7,18 +7,24 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NavUtils;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.room.Room;
 import com.example.note.R;
 import com.example.note.database.AppDatabase;
 import com.example.note.databinding.FragmentDashboardBinding;
 import com.example.note.models.Note;
+import com.example.note.ui.view_note.ViewNoteFragment;
+
 import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -70,6 +76,16 @@ public class DashboardFragment extends Fragment {
 
             TextView textView = view.findViewById(R.id.text);
             textView.setText(note.getTitle());
+
+            Button button = view.findViewById(R.id.view_note);
+            button.setOnClickListener(view1 -> {
+                NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+
+                Bundle bundle = new Bundle();
+                bundle.putInt(ViewNoteFragment.KEY, note.getId());
+
+                navController.navigate(R.id.navigation_view_note, bundle);
+            });
 
             linearLayout.addView(view);
             linearLayout.invalidate();
