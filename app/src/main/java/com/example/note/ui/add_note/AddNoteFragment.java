@@ -11,6 +11,7 @@ import androidx.room.Room;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 
 import com.example.note.R;
 import com.example.note.database.AppDatabase;
@@ -28,6 +29,7 @@ import java.util.List;
 public class AddNoteFragment extends Fragment {
     private FragmentAddNoteBinding fragmentAddNoteBinding;
     private AppDatabase appDatabase;
+    private boolean showInHomeScreen = true;
 
     public AddNoteFragment() {
         // Required empty public constructor
@@ -44,8 +46,14 @@ public class AddNoteFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         fragmentAddNoteBinding = FragmentAddNoteBinding.inflate(inflater);
+
+        fragmentAddNoteBinding.switchMaterial.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                AddNoteFragment.this.showInHomeScreen = b;
+            }
+        });
 
         return fragmentAddNoteBinding.getRoot();
     }
@@ -65,20 +73,26 @@ public class AddNoteFragment extends Fragment {
                 note.setContent(description);
                 note.setRelated("[]");
                 note.setTime(new Date().getTime());
+                note.setPinned(AddNoteFragment.this.showInHomeScreen);
 
-                AsyncTask.execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        List<Note> noteList = appDatabase.noteDao().getAll();
+                AsyncTask.execute(() -> {
+                    List<Note> noteList = appDatabase.noteDao().getAll();
 
-                        int id = noteList.get(noteList.size() - 1).getId() + 1;
-                        note.setId(id);
+                    int id = 0;
 
-                        appDatabase.noteDao().insertAll(note);
-
-                        Snackbar.make(view, "The note is added", Snackbar.LENGTH_LONG)
-                                .setAction("Close", null).show();
+                    if(noteList.size() == 0){
+                        id = 1;
+                    } else{
+                        Note lastNote = noteList.get(noteList.size() - 1);
+                        id = lastNote.getId() + 1;
                     }
+
+                    note.setId(id);
+
+                    appDatabase.noteDao().insertAll(note);
+
+                    Snackbar.make(view, "The note is added", Snackbar.LENGTH_LONG)
+                            .setAction("Close", null).show();
                 });
             }
         });

@@ -21,6 +21,17 @@ public class Note {
     @ColumnInfo
     private String related;
 
+    @ColumnInfo
+    private boolean isPinned;
+
+    public boolean isPinned() {
+        return isPinned;
+    }
+
+    public void setPinned(boolean pinned) {
+        isPinned = pinned;
+    }
+
     public int getId() {
         return id;
     }

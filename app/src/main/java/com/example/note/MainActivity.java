@@ -3,6 +3,7 @@ package com.example.note;
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.note.database.AppDatabase;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;

@@ -60,6 +60,15 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <com.google.android.material.switchmaterial.SwitchMaterial
+            android:id="@+id/switch_material"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/show_the_note_in_home_screen"
+            android:layout_marginTop="@dimen/space_half"
+            />
+
         <Button
             android:id="@+id/add_note_btn"
             android:layout_width="match_parent"

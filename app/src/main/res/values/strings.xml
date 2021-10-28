@@ -15,4 +15,6 @@
     <string name="view">View</string>
     <string name="your_note">Your note</string>
     <string name="delete">Delete</string>
+    <string name="upload_media">Upload media</string>
+    <string name="show_the_note_in_home_screen">Show the note in home screen</string>
 </resources>
