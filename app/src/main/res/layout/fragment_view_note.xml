@@ -71,17 +71,6 @@
                     />
 
                 <Button
-                    android:id="@+id/upload_btn"
-                    android:layout_width="140dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:text="@string/upload_media"
-                    android:gravity="center_horizontal"
-                    android:layout_marginTop="@dimen/space"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    />
-
-                <Button
                     android:id="@+id/delete_btn"
                     android:layout_width="140dp"
                     android:layout_height="wrap_content"

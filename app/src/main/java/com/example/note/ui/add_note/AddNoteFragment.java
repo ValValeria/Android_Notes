@@ -1,27 +1,31 @@
 package com.example.note.ui.add_note;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-
-import com.example.note.R;
 import com.example.note.database.AppDatabase;
 import com.example.note.databinding.FragmentAddNoteBinding;
 import com.example.note.models.Note;
 import com.google.android.material.snackbar.Snackbar;
-
 import org.jetbrains.annotations.NotNull;
 
-import java.text.SimpleDateFormat;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -30,6 +34,8 @@ public class AddNoteFragment extends Fragment {
     private FragmentAddNoteBinding fragmentAddNoteBinding;
     private AppDatabase appDatabase;
     private boolean showInHomeScreen = true;
+    private ActivityResultLauncher<String> mGetPhotoContent;
+    private ActivityResultLauncher<String> mGetVideoContent;
 
     public AddNoteFragment() {
         // Required empty public constructor
@@ -41,6 +47,16 @@ public class AddNoteFragment extends Fragment {
 
         appDatabase = Room.databaseBuilder(requireActivity().getApplicationContext(),
                 AppDatabase.class, AppDatabase.DB_NAME).build();
+
+        mGetPhotoContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
+                uri -> {
+                    try {
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
     }
 
     @Override
@@ -48,12 +64,8 @@ public class AddNoteFragment extends Fragment {
                              Bundle savedInstanceState) {
         fragmentAddNoteBinding = FragmentAddNoteBinding.inflate(inflater);
 
-        fragmentAddNoteBinding.switchMaterial.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                AddNoteFragment.this.showInHomeScreen = b;
-            }
-        });
+        fragmentAddNoteBinding.switchMaterial.setOnCheckedChangeListener((compoundButton, b) -> AddNoteFragment.this.showInHomeScreen = b);
+        fragmentAddNoteBinding.uploadBtn.setOnClickListener(view -> mGetPhotoContent.launch("image/**"));
 
         return fragmentAddNoteBinding.getRoot();
     }

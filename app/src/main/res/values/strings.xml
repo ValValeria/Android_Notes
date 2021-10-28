@@ -17,4 +17,6 @@
     <string name="delete">Delete</string>
     <string name="upload_media">Upload media</string>
     <string name="show_the_note_in_home_screen">Show the note in home screen</string>
+    <string name="upload_a_photo">Upload a photo</string>
+    <string name="upload_a_video">Upload a video</string>
 </resources>

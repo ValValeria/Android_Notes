@@ -70,12 +70,34 @@
             />
 
         <Button
+            android:id="@+id/upload_btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/upload_a_photo"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="@dimen/space"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            />
+
+        <Button
+            android:id="@+id/upload_video_btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/upload_a_video"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="@dimen/space_half"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            />
+
+        <Button
             android:id="@+id/add_note_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/submit"
-            android:layout_marginTop="@dimen/space"
+            android:layout_marginTop="@dimen/space_half"
             />
     </LinearLayout>
 </ScrollView>
