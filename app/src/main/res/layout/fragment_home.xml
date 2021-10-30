@@ -1,33 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment">
+    >
 
-    <LinearLayout
-        android:padding="@dimen/space"
-        android:orientation="vertical"
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="noResults"
+            type="androidx.databinding.ObservableBoolean" />
+    </data>
+
+    <ScrollView
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/text_dashboard"
-            style="@style/TextAppearance.MaterialComponents.Headline5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:text="@string/home"
-            android:textAlignment="center"
-            />
+        android:layout_height="match_parent"
+        tools:context=".ui.home.HomeFragment">
 
         <LinearLayout
-            android:id="@+id/list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="200dp"
+            android:padding="@dimen/space"
             android:orientation="vertical"
-            android:layout_marginTop="@dimen/space"
-            />
-    </LinearLayout>
-</ScrollView>
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/text_dashboard"
+                style="@style/TextAppearance.MaterialComponents.Headline5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/home"
+                android:textAlignment="center"
+                />
+
+            <LinearLayout
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="200dp"
+                android:orientation="vertical"
+                android:layout_marginTop="@dimen/space">
+                <include
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    layout="@layout/no_results"
+                    android:visibility="@{noResults ? View.VISIBLE : View.GONE}"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</layout>

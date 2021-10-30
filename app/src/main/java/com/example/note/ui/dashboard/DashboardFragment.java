@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NavUtils;
+import androidx.databinding.ObservableBoolean;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -33,6 +34,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class DashboardFragment extends Fragment {
     private FragmentDashboardBinding binding;
     private static final ConcurrentLinkedDeque<Note> notes = new ConcurrentLinkedDeque<>();
+    public final ObservableBoolean noResults = new ObservableBoolean(true);
     private AppDatabase appDatabase;
     private LinearLayout linearLayout;
 
@@ -50,12 +52,12 @@ public class DashboardFragment extends Fragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                notes.addAll(appDatabase.noteDao().getAll());
+        AsyncTask.execute(() -> {
+            notes.addAll(appDatabase.noteDao().getAll());
 
-                view.post(DashboardFragment.this::addViews);
+            if(notes.size() > 0){
+              view.post(DashboardFragment.this::addViews);
+              noResults.set(false);
             }
         });
     }

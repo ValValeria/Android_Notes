@@ -9,24 +9,22 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.ObservableBoolean;
+import androidx.databinding.ObservableField;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.room.Room;
-
 import com.example.note.R;
 import com.example.note.database.AppDatabase;
 import com.example.note.databinding.FragmentHomeBinding;
 import com.example.note.models.Note;
 import com.example.note.ui.view_note.ViewNoteFragment;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 
 public class HomeFragment extends Fragment {
@@ -34,6 +32,7 @@ public class HomeFragment extends Fragment {
     private AppDatabase appDatabase;
     private final ArrayList<Note> noteArrayList = new ArrayList<>();
     private LinearLayout linearLayout;
+    public final ObservableBoolean noResults = new ObservableBoolean();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -41,6 +40,8 @@ public class HomeFragment extends Fragment {
         appDatabase = Room.databaseBuilder(requireActivity().getApplicationContext(),
                 AppDatabase.class, AppDatabase.DB_NAME).build();
         linearLayout = binding.list;
+
+        noResults.set(true);
 
         return binding.getRoot();
     }
@@ -56,7 +57,10 @@ public class HomeFragment extends Fragment {
                 }
             }
 
-            view.post(HomeFragment.this::addViews);
+            if(noteArrayList.size() > 0){
+               view.post(HomeFragment.this::addViews);
+               noResults.set(false);
+            }
         });
     }
 

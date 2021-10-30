@@ -1,29 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_gravity="start"
-    android:padding="@dimen/space"
-    tools:context=".ui.dashboard.DashboardFragment">
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
 
-    <TextView
-        android:id="@+id/text_dashboard"
-        style="@style/TextAppearance.MaterialComponents.Headline5"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:text="@string/your_notes"
-        android:textAlignment="center"
-    />
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="noResults"
+            type="androidx.databinding.ObservableBoolean" />
+    </data>
 
-    <LinearLayout
-        android:id="@+id/list"
+    <ScrollView
+        android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="200dp"
-        android:orientation="vertical"
-        android:layout_marginTop="@dimen/space"
-        />
-</LinearLayout>
+        >
+        <LinearLayout
+            xmlns:tools="http://schemas.android.com/tools"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:padding="@dimen/space"
+            tools:context=".ui.dashboard.DashboardFragment">
+
+            <TextView
+                android:id="@+id/text_dashboard"
+                style="@style/TextAppearance.MaterialComponents.Headline5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/your_notes"
+                android:textAlignment="center"
+                />
+
+            <LinearLayout
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="200dp"
+                android:orientation="vertical"
+                android:layout_marginTop="@dimen/space"
+                >
+                <include
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    layout="@layout/no_results"
+                    android:visibility="@{noResults ? View.VISIBLE : View.GONE}"
+                    />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</layout>

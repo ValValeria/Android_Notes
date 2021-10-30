@@ -19,4 +19,8 @@
     <string name="show_the_note_in_home_screen">Show the note in home screen</string>
     <string name="upload_a_photo">Upload a photo</string>
     <string name="upload_a_video">Upload a video</string>
+    <string name="add_a_note">Add a note</string>
+    <string name="create_your_notes_it_is_very_easy">Create your notes. It is very easy.</string>
+    <string name="there_are_no_results">There are no results</string>
+    <string name="your_uploaded_media">Your uploaded media</string>
 </resources>
