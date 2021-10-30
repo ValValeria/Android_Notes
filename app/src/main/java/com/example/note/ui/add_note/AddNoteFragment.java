@@ -1,5 +1,6 @@
 package com.example.note.ui.add_note;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -23,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.example.note.R;
 import com.example.note.database.AppDatabase;
@@ -60,16 +62,32 @@ public class AddNoteFragment extends Fragment {
         mGetPhotoContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
                 uri -> {
                     try {
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri);
+                        ContentResolver contentResolver = requireContext().getContentResolver();
+                        String type = contentResolver.getType(uri);
                         LayoutInflater layoutInflater = (LayoutInflater) requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                        View image = layoutInflater.inflate(R.layout.image, fragmentAddNoteBinding.images, true);
-                        ImageView imageView = image.findViewById(R.id.image);
-                        imageView.setImageBitmap(bitmap);
+                        String message = "";
 
-                        imagesUrl.add(uri.getPath());
-                        hasImages.set(true);
+                        if(type.startsWith("image/")){
+                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri);
+                            View image = layoutInflater.inflate(R.layout.image, fragmentAddNoteBinding.images, true);
+                            ImageView imageView = image.findViewById(R.id.image);
+                            imageView.setImageBitmap(bitmap);
 
-                        Toast.makeText(requireContext(), "The image is uploaded", Toast.LENGTH_LONG).show();
+                            imagesUrl.add(uri.getPath());
+                            hasImages.set(true);
+
+                            message = "The image is uploaded";
+                        }
+
+                        if(type.startsWith("video/")){
+                            View view1 = layoutInflater.inflate(R.layout.video, fragmentAddNoteBinding.images, true);
+                            VideoView videoView = view1.findViewById(R.id.video);
+                            videoView.setVideoURI(uri);
+
+                            hasImages.set(true);
+                        }
+
+                        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -82,7 +100,7 @@ public class AddNoteFragment extends Fragment {
         fragmentAddNoteBinding = FragmentAddNoteBinding.inflate(inflater);
 
         fragmentAddNoteBinding.switchMaterial.setOnCheckedChangeListener((compoundButton, b) -> AddNoteFragment.this.showInHomeScreen = b);
-        fragmentAddNoteBinding.uploadBtn.setOnClickListener(view -> mGetPhotoContent.launch("image/**"));
+        fragmentAddNoteBinding.uploadBtn.setOnClickListener(view -> mGetPhotoContent.launch(""));
 
         return fragmentAddNoteBinding.getRoot();
     }
