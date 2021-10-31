@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -48,6 +49,7 @@ public class AddNoteFragment extends Fragment {
     private ActivityResultLauncher<String> mGetPhotoContent;
     public final ObservableBoolean hasImages = new ObservableBoolean(false);
     private final ArrayList<String> imagesUrl = new ArrayList<>();
+    private View view;
 
     public AddNoteFragment() {
     }
@@ -59,39 +61,7 @@ public class AddNoteFragment extends Fragment {
         appDatabase = Room.databaseBuilder(requireActivity().getApplicationContext(),
                 AppDatabase.class, AppDatabase.DB_NAME).build();
 
-        mGetPhotoContent = registerForActivityResult(new ActivityResultContracts.GetContent(),
-                uri -> {
-                    try {
-                        ContentResolver contentResolver = requireContext().getContentResolver();
-                        String type = contentResolver.getType(uri);
-                        LayoutInflater layoutInflater = (LayoutInflater) requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                        String message = "";
-
-                        if(type.startsWith("image/")){
-                            Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri);
-                            View image = layoutInflater.inflate(R.layout.image, fragmentAddNoteBinding.images, true);
-                            ImageView imageView = image.findViewById(R.id.image);
-                            imageView.setImageBitmap(bitmap);
-
-                            imagesUrl.add(uri.getPath());
-                            hasImages.set(true);
-
-                            message = "The image is uploaded";
-                        }
-
-                        if(type.startsWith("video/")){
-                            View view1 = layoutInflater.inflate(R.layout.video, fragmentAddNoteBinding.images, true);
-                            VideoView videoView = view1.findViewById(R.id.video);
-                            videoView.setVideoURI(uri);
-
-                            hasImages.set(true);
-                        }
-
-                        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                });
+        mGetPhotoContent = registerForActivityResult(new ActivityResultContracts.GetContent(), this::handleFileUpload);
     }
 
     @Override
@@ -100,7 +70,7 @@ public class AddNoteFragment extends Fragment {
         fragmentAddNoteBinding = FragmentAddNoteBinding.inflate(inflater);
 
         fragmentAddNoteBinding.switchMaterial.setOnCheckedChangeListener((compoundButton, b) -> AddNoteFragment.this.showInHomeScreen = b);
-        fragmentAddNoteBinding.uploadBtn.setOnClickListener(view -> mGetPhotoContent.launch(""));
+        fragmentAddNoteBinding.uploadBtn.setOnClickListener(view -> mGetPhotoContent.launch("image/**"));
 
         return fragmentAddNoteBinding.getRoot();
     }
@@ -142,5 +112,53 @@ public class AddNoteFragment extends Fragment {
                         .setAction("Close", null).show();
             });
         });
+    }
+
+    private void handleFileUpload(Uri uri){
+        try {
+            ContentResolver contentResolver = requireContext().getContentResolver();
+            String type = contentResolver.getType(uri);
+            LayoutInflater layoutInflater = (LayoutInflater) requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            String message = "";
+            int index = imagesUrl.size();
+
+            View.OnClickListener handleClick = v -> {
+                if(view != null){
+                    imagesUrl.remove(index);
+                    fragmentAddNoteBinding.images.removeView(view);
+                    fragmentAddNoteBinding.images.invalidate();
+                }
+            };
+
+            if(type.startsWith("image/")){
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri);
+                view = layoutInflater.inflate(R.layout.image, fragmentAddNoteBinding.images, true);
+                ImageView imageView = view.findViewById(R.id.image);
+                imageView.setImageBitmap(bitmap);
+
+                hasImages.set(true);
+
+                message = "The image is uploaded";
+            }
+
+            if(type.startsWith("video/")){
+                view = layoutInflater.inflate(R.layout.video, fragmentAddNoteBinding.images, true);
+                VideoView videoView = view.findViewById(R.id.video);
+                videoView.setVideoURI(uri);
+
+                hasImages.set(true);
+            }
+
+            if(view != null && !message.isEmpty()){
+                Button button = view.findViewById(R.id.delete_btn);
+                button.setOnClickListener(handleClick);
+                imagesUrl.add(index, uri.getPath());
+                fragmentAddNoteBinding.images.addView(view);
+
+                Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

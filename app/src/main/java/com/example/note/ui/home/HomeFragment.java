@@ -37,6 +37,8 @@ public class HomeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
+        binding.setNoResults(noResults);
+
         appDatabase = Room.databaseBuilder(requireActivity().getApplicationContext(),
                 AppDatabase.class, AppDatabase.DB_NAME).build();
         linearLayout = binding.list;
@@ -58,7 +60,7 @@ public class HomeFragment extends Fragment {
             }
 
             if(noteArrayList.size() > 0){
-               view.post(HomeFragment.this::addViews);
+               addViews();
                noResults.set(false);
             }
         });

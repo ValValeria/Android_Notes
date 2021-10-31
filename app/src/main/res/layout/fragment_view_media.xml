@@ -1,57 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
-
     <data>
         <import type="android.view.View"/>
         <variable
-            name="noResults"
+            name="isVideo"
             type="androidx.databinding.ObservableBoolean" />
     </data>
-
     <ScrollView
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.home.HomeFragment">
+        tools:context="com.example.note.ui.add_note.AddNoteFragment">
 
         <LinearLayout
-            android:padding="@dimen/space"
-            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/space"
+            >
+
             <TextView
                 android:id="@+id/text_dashboard"
                 style="@style/TextAppearance.MaterialComponents.Headline5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="@string/your_uploaded_media"
+                android:text="@string/view_media"
                 android:textAlignment="center"
+                android:layout_marginBottom="@dimen/space"
                 />
 
-            <LinearLayout
+            <VideoView
+                android:id="@+id/video"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="@{noResults ? View.VISIBLE : View.GONE}"
-                >
-                <include
-                    android:layout_marginTop="@dimen/space"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    layout="@layout/no_results"
-                    />
-            </LinearLayout>
+                android:layout_marginTop="@dimen/space"
+                android:visibility="@{isVideo ? View.VISIBLE : View.GONE}"
+                />
 
-            <LinearLayout
-                android:id="@+id/images"
-                android:orientation="vertical"
+            <ImageView
+                android:id="@+id/image"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="@{!noResults ? View.VISIBLE : View.GONE}"
+                android:layout_marginTop="@dimen/space"
+                android:visibility="@{!isVideo ? View.VISIBLE : View.GONE}"
+                />
+
+            <Button
+                android:id="@+id/delete_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/delete_the_media"
+                android:gravity="center_horizontal"
                 />
         </LinearLayout>
     </ScrollView>

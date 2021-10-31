@@ -2,7 +2,6 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.note.ui.add_note.AddNoteFragment">
@@ -76,6 +75,16 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="@string/delete"
+                    android:gravity="center_horizontal"
+                    />
+
+                <Button
+                    android:id="@+id/update_btn"
+                    android:layout_width="140dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/space_half"
+                    android:text="@string/update_the_note"
                     android:gravity="center_horizontal"
                     />
             </LinearLayout>

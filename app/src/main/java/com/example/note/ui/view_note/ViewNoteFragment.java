@@ -6,19 +6,23 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.room.Room;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 import com.example.note.R;
 import com.example.note.database.AppDatabase;
 import com.example.note.databinding.FragmentViewNoteBinding;
 import com.example.note.models.Note;
+import com.example.note.ui.update_note.UpdateNoteDialogFragment;
 import com.google.android.material.snackbar.Snackbar;
-
 import java.util.List;
+import java.util.Map;
+import io.reactivex.rxjava3.subjects.PublishSubject;
+
 
 public class ViewNoteFragment extends Fragment {
+    public static PublishSubject<Map<String, String>> changes = PublishSubject.create();
     public final static String KEY = "id";
     private int id;
     private AppDatabase appDatabase;
@@ -61,7 +65,11 @@ public class ViewNoteFragment extends Fragment {
             int id = ViewNoteFragment.this.id;
             List<Note> list = ViewNoteFragment.this.appDatabase.noteDao().loadAllByIds(new int[]{id});
 
-            return list.get(list.size() - 1);
+            if(list.size() > 0){
+               return list.get(list.size() - 1);
+            }
+
+            return null;
         }
 
         @Override
@@ -81,6 +89,27 @@ public class ViewNoteFragment extends Fragment {
                 snackbar.show();
 
                 navController.navigate(R.id.navigation_dashboard);
+            });
+            fragmentViewNoteBinding.updateBtn.setOnClickListener(view -> {
+                UpdateNoteDialogFragment updateNoteDialogFragment = new UpdateNoteDialogFragment();
+                updateNoteDialogFragment.show(getParentFragmentManager(), "");
+
+                changes.subscribe(v -> {
+                    String title = v.get("title");
+                    String description = v.get("description");
+
+                    AsyncTask.execute(() -> {
+                        appDatabase.noteDao().delete(note);
+
+                        note.setTitle(title);
+                        note.setContent(description);
+
+                        appDatabase.noteDao().insertAll(note);
+
+                        Toast.makeText(requireContext(), "The changes is saved", Toast.LENGTH_LONG)
+                                .show();
+                    });
+                });
             });
         }
     }

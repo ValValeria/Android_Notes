@@ -42,12 +42,18 @@
                 android:orientation="vertical"
                 android:layout_marginTop="@dimen/space"
                 >
-                <include
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    layout="@layout/no_results"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
                     android:visibility="@{noResults ? View.VISIBLE : View.GONE}"
-                    />
+                    >
+                    <include
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        layout="@layout/no_results"
+                        />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

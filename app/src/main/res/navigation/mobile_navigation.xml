@@ -30,6 +30,12 @@
         tools:layout="@layout/fragment_add_note" />
 
     <fragment
+        android:id="@+id/navigation_view_media"
+        android:name="com.example.note.ui.view_media.ViewMediaFragment"
+        android:label="View media"
+        tools:layout="@layout/fragment_view_media" />
+
+    <fragment
         android:id="@+id/navigation_notifications"
         android:name="com.example.note.ui.notifications.NotificationsFragment"
         android:label="@string/title_notifications"

@@ -23,4 +23,7 @@
     <string name="create_your_notes_it_is_very_easy">Create your notes. It is very easy.</string>
     <string name="there_are_no_results">There are no results</string>
     <string name="your_uploaded_media">Your uploaded media</string>
+    <string name="view_media">View media</string>
+    <string name="delete_the_media">Delete the media</string>
+    <string name="update_the_note">Update the note</string>
 </resources>

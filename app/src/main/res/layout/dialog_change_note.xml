@@ -1,16 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
-
-    <data>
-        <import type="android.view.View"/>
-        <variable
-            name="hasImages"
-            type="androidx.databinding.ObservableBoolean" />
-    </data>
-<ScrollView
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -31,15 +22,8 @@
             android:gravity="center_horizontal"
             android:text="@string/add_a_new_note"
             android:textAlignment="center"
-        />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/images"
-            android:orientation="horizontal"
-            android:visibility="@{hasImages ? View.VISIBLE : View.GONE}"
             />
+
 
         <com.google.android.material.textfield.TextInputLayout
             app:endIconMode="clear_text"
@@ -71,40 +55,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/descrInput"
-                android:minLines="10"
+                android:minLines="5"
                 android:maxLength="900"
                 />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switch_material"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:text="@string/show_the_note_in_home_screen"
-            android:layout_marginTop="@dimen/space_half"
-            />
-
-        <Button
-            android:id="@+id/upload_btn"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/upload_media"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="@dimen/space"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            />
-
-        <Button
-            android:id="@+id/add_note_btn"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/submit"
-            android:layout_marginTop="@dimen/space_half"
-            />
     </LinearLayout>
 </ScrollView>
-</layout>
