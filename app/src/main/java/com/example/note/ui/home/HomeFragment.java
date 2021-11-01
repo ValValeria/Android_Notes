@@ -27,6 +27,9 @@ import com.example.note.ui.view_note.ViewNoteFragment;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
     private AppDatabase appDatabase;
@@ -52,18 +55,20 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        AsyncTask.execute(() -> {
-            for(Note note: appDatabase.noteDao().getAll()){
-                if(note.isPinned()){
-                    noteArrayList.add(note);
-                }
-            }
+        Disposable disposable = appDatabase.noteDao().getAllNotes()
+                .subscribeOn(Schedulers.io())
+                .subscribe(v -> {
+                    for(Note note: appDatabase.noteDao().getAll()){
+                        if(note.isPinned()){
+                            noteArrayList.add(note);
+                            addViews(note);
+                        }
+                    }
 
-            if(noteArrayList.size() > 0){
-               addViews();
-               noResults.set(false);
-            }
-        });
+                    if(noteArrayList.size() > 0){
+                        noResults.set(false);
+                    }
+                });
     }
 
     @Override
@@ -75,26 +80,25 @@ public class HomeFragment extends Fragment {
     /**
      * Adds views to fragment layout
      */
-    private void addViews(){
-        for(Note note: noteArrayList){
-            LayoutInflater layoutInflater = (LayoutInflater) requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View view = layoutInflater.inflate(R.layout.list_item, linearLayout, false);
+    private void addViews(Note note){
+        LayoutInflater layoutInflater = (LayoutInflater) requireActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = layoutInflater.inflate(R.layout.list_item, linearLayout, false);
 
-            TextView textView = view.findViewById(R.id.text);
-            textView.setText(note.getTitle());
+        TextView textView = view.findViewById(R.id.text);
+        textView.setText(note.getTitle());
 
-            Button button = view.findViewById(R.id.view_note);
-            button.setOnClickListener(view1 -> {
-                NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+        Button button = view.findViewById(R.id.view_note);
+        button.setOnClickListener(view1 -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
 
-                Bundle bundle = new Bundle();
-                bundle.putInt(ViewNoteFragment.KEY, note.getId());
+            Bundle bundle = new Bundle();
+            bundle.putInt(ViewNoteFragment.KEY, note.getId());
 
-                navController.navigate(R.id.navigation_view_note, bundle);
-            });
+            navController.navigate(R.id.navigation_view_note, bundle);
+        });
 
-            linearLayout.addView(view);
-            linearLayout.invalidate();
-        }
+        linearLayout.addView(view);
+        linearLayout.invalidate();
+        linearLayout.requestLayout();
     }
 }

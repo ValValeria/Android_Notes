@@ -9,10 +9,15 @@ import com.example.note.models.Note;
 
 import java.util.List;
 
+import io.reactivex.Flowable;
+
 @Dao
 public interface NoteDao {
     @Query("SELECT * FROM note")
     List<Note> getAll();
+
+    @Query("SELECT * FROM note")
+    Flowable<List<Note>> getAllNotes();
 
     @Query("SELECT * FROM note WHERE id IN (:ids)")
     List<Note> loadAllByIds(int[] ids);

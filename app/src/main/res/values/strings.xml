@@ -26,4 +26,5 @@
     <string name="view_media">View media</string>
     <string name="delete_the_media">Delete the media</string>
     <string name="update_the_note">Update the note</string>
+    <string name="your_media">Your media</string>
 </resources>

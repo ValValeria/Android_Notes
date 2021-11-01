@@ -27,6 +27,8 @@ import com.example.note.models.Note;
 import com.example.note.ui.view_note.ViewNoteFragment;
 
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 
@@ -34,6 +36,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public class DashboardFragment extends Fragment {
     private FragmentDashboardBinding binding;
     private static final ConcurrentLinkedDeque<Note> notes = new ConcurrentLinkedDeque<>();
+    private static final ConcurrentLinkedDeque<Integer> noteIds = new ConcurrentLinkedDeque<>();
     public final ObservableBoolean noResults = new ObservableBoolean(true);
     private AppDatabase appDatabase;
     private LinearLayout linearLayout;
@@ -55,7 +58,14 @@ public class DashboardFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         AsyncTask.execute(() -> {
-            notes.addAll(appDatabase.noteDao().getAll());
+            List<Note> noteList = appDatabase.noteDao().getAll();
+
+            for(Note note: noteList){
+                if(!noteIds.contains(note.getId())){
+                    DashboardFragment.notes.add(note);
+                    DashboardFragment.noteIds.add(note.getId());
+                }
+            }
 
             if(notes.size() > 0){
               view.post(DashboardFragment.this::addViews);

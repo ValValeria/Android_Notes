@@ -28,7 +28,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="@string/your_uploaded_media"
+                android:text="@string/your_media"
                 android:textAlignment="center"
                 />
 

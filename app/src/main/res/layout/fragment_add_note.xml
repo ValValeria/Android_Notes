@@ -39,6 +39,9 @@
             android:id="@+id/images"
             android:orientation="horizontal"
             android:visibility="@{hasImages ? View.VISIBLE : View.GONE}"
+            android:minHeight="@dimen/space"
+            android:background="@color/orange"
+            android:layout_marginTop="@dimen/space"
             />
 
         <com.google.android.material.textfield.TextInputLayout
@@ -91,9 +94,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
-            android:text="@string/upload_media"
+            android:text="@string/upload_a_photo"
             android:gravity="center_horizontal"
             android:layout_marginTop="@dimen/space"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            />
+
+        <Button
+            android:id="@+id/upload_video_btn"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/upload_a_video"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="@dimen/space_sm"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             />
 
@@ -103,7 +117,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/submit"
-            android:layout_marginTop="@dimen/space_half"
+            android:layout_marginTop="@dimen/space_sm"
             />
     </LinearLayout>
 </ScrollView>

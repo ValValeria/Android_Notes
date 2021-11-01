@@ -71,20 +71,22 @@
 
                 <Button
                     android:id="@+id/delete_btn"
-                    android:layout_width="140dp"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
                     android:text="@string/delete"
                     android:gravity="center_horizontal"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     />
 
                 <Button
                     android:id="@+id/update_btn"
-                    android:layout_width="140dp"
+                    android:layout_width="200dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="@dimen/space_half"
+                    android:layout_marginTop="@dimen/space_sm"
                     android:text="@string/update_the_note"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:gravity="center_horizontal"
                     />
             </LinearLayout>

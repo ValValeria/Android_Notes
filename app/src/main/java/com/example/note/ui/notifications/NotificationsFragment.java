@@ -9,10 +9,13 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.VideoView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,6 +39,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 public class NotificationsFragment extends Fragment {
     private FragmentNotificationsBinding binding;
     public final ObservableBoolean noResults = new ObservableBoolean(true);
@@ -55,59 +61,71 @@ public class NotificationsFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onStart() {
+        super.onStart();
 
-        AsyncTask.execute(() -> {
-            List<Note> noteList = appDatabase.noteDao().getAll();
+        Button button = requireActivity().findViewById(R.id.add_new_note_btn);
+        button.setOnClickListener(view -> {
+            NavController navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
 
-            for(Note note: noteList){
-                try {
-                    JSONArray urls = new JSONArray(note.getRelated());
-
-                    for (int i = 0; i < urls.length(); i++) {
-                        Uri uri = Uri.parse(urls.get(i).toString());
-                        ContentResolver contentResolver = requireContext().getContentResolver();
-                        String type = contentResolver.getType(uri);
-                        LayoutInflater layoutInflater = (LayoutInflater) requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-                        View.OnClickListener handleClick = view12 -> {
-                            Bundle bundle = new Bundle();
-                            bundle.putString(ViewMediaFragment.URI, uri.toString());
-                            bundle.putInt(ViewMediaFragment.ID, note.getId());
-
-                            navController.navigate(R.id.navigation_view_media, bundle);
-                        };
-
-                        if(type.startsWith("image/")){
-                           Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri);
-                           View image = layoutInflater.inflate(R.layout.image, binding.images, true);
-                           image.setOnClickListener(handleClick);
-
-                           ImageView imageView = image.findViewById(R.id.image);
-                           imageView.setImageBitmap(bitmap);
-                        }
-
-                        if(type.startsWith("video/")){
-                            View view1 = layoutInflater.inflate(R.layout.video, binding.images, true);
-                            view1.setOnClickListener(handleClick);
-
-                            VideoView videoView = view1.findViewById(R.id.video);
-                            videoView.setVideoURI(uri);
-                        }
-
-                        noResults.set(false);
-                    }
-                } catch (JSONException | IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            navController.navigate(R.id.navigation_add_note);
         });
+
+        Disposable disposable = appDatabase.noteDao().getAllNotes()
+                .subscribeOn(Schedulers.io())
+                .subscribe(v -> {
+                  loadData(v);
+                });
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private void loadData(List<Note> noteList){
+        for(Note note: noteList){
+            try {
+                JSONArray urls = new JSONArray(note.getRelated());
+
+                for (int i = 0; i < urls.length(); i++) {
+                    Uri uri = Uri.parse(urls.get(i).toString());
+                    ContentResolver contentResolver = requireContext().getContentResolver();
+                    String type = contentResolver.getType(uri);
+
+                    LayoutInflater layoutInflater = (LayoutInflater) requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                    View.OnClickListener handleClick = view12 -> {
+                        Bundle bundle = new Bundle();
+                        bundle.putString(ViewMediaFragment.URI, uri.toString());
+                        bundle.putInt(ViewMediaFragment.ID, note.getId());
+
+                        navController.navigate(R.id.navigation_view_media, bundle);
+                    };
+
+                    if(type.startsWith("image/")){
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri);
+                        View image = layoutInflater.inflate(R.layout.image, binding.images, true);
+                        image.setOnClickListener(handleClick);
+
+                        ImageView imageView = image.findViewById(R.id.image);
+                        imageView.setImageBitmap(bitmap);
+                    }
+
+                    if(type.startsWith("video/")){
+                        View view1 = layoutInflater.inflate(R.layout.video, binding.images, true);
+                        view1.setOnClickListener(handleClick);
+
+                        VideoView videoView = view1.findViewById(R.id.video);
+                        videoView.setVideoURI(uri);
+                    }
+
+                    noResults.set(false);
+                }
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -31,6 +31,7 @@ import com.example.note.R;
 import com.example.note.database.AppDatabase;
 import com.example.note.databinding.FragmentAddNoteBinding;
 import com.example.note.models.Note;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
@@ -49,6 +50,8 @@ public class AddNoteFragment extends Fragment {
     private ActivityResultLauncher<String> mGetPhotoContent;
     public final ObservableBoolean hasImages = new ObservableBoolean(false);
     private final ArrayList<String> imagesUrl = new ArrayList<>();
+    private FloatingActionButton floatingActionButton;
+    private final String TAG = AddNoteFragment.class.getName();
     private View view;
 
     public AddNoteFragment() {
@@ -71,8 +74,24 @@ public class AddNoteFragment extends Fragment {
 
         fragmentAddNoteBinding.switchMaterial.setOnCheckedChangeListener((compoundButton, b) -> AddNoteFragment.this.showInHomeScreen = b);
         fragmentAddNoteBinding.uploadBtn.setOnClickListener(view -> mGetPhotoContent.launch("image/**"));
+        fragmentAddNoteBinding.uploadVideoBtn.setOnClickListener(view -> mGetPhotoContent.launch("video/**"));
 
         return fragmentAddNoteBinding.getRoot();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        floatingActionButton = requireActivity().findViewById(R.id.floating_action_button);
+        floatingActionButton.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        floatingActionButton.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -132,30 +151,37 @@ public class AddNoteFragment extends Fragment {
 
             if(type.startsWith("image/")){
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri);
-                view = layoutInflater.inflate(R.layout.image, fragmentAddNoteBinding.images, true);
+                view = layoutInflater.inflate(R.layout.image, fragmentAddNoteBinding.images, false);
                 ImageView imageView = view.findViewById(R.id.image);
                 imageView.setImageBitmap(bitmap);
 
-                hasImages.set(true);
-
                 message = "The image is uploaded";
+
+                Log.i(TAG, "Media size is " + bitmap.getRowBytes());
             }
 
             if(type.startsWith("video/")){
-                view = layoutInflater.inflate(R.layout.video, fragmentAddNoteBinding.images, true);
+                view = layoutInflater.inflate(R.layout.video, fragmentAddNoteBinding.images, false);
                 VideoView videoView = view.findViewById(R.id.video);
                 videoView.setVideoURI(uri);
 
-                hasImages.set(true);
+                message = "The video is uploaded";
             }
 
             if(view != null && !message.isEmpty()){
                 Button button = view.findViewById(R.id.delete_btn);
                 button.setOnClickListener(handleClick);
                 imagesUrl.add(index, uri.getPath());
+
+                hasImages.set(true);
+
+                fragmentAddNoteBinding.images.setVisibility(View.VISIBLE);
                 fragmentAddNoteBinding.images.addView(view);
+                fragmentAddNoteBinding.images.invalidate();
+                fragmentAddNoteBinding.images.requestLayout();
 
                 Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show();
+                Log.i(TAG, "New media view is added");
             }
         } catch (IOException e) {
             e.printStackTrace();
