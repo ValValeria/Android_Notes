@@ -1,11 +1,13 @@
 package com.example.note;
 
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.example.note.database.AppDatabase;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -44,5 +46,16 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         floatingActionButton.setOnClickListener(view -> navController.navigate(R.id.navigation_add_note));
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            if (navController.popBackStack()) {
+                navController.navigate(R.id.navigation_home);
+            }
+        }
+
+        return true;
     }
 }

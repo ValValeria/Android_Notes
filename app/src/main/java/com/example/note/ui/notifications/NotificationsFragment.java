@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,6 +30,8 @@ import com.example.note.database.AppDatabase;
 import com.example.note.databinding.FragmentNotificationsBinding;
 import com.example.note.models.Note;
 import com.example.note.ui.view_media.ViewMediaFragment;
+import com.example.note.ui.view_note.ViewNoteFragment;
+
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,8 +48,10 @@ import io.reactivex.schedulers.Schedulers;
 public class NotificationsFragment extends Fragment {
     private FragmentNotificationsBinding binding;
     public final ObservableBoolean noResults = new ObservableBoolean(true);
+    private final String TAG = NotificationsFragment.class.getName();
     private AppDatabase appDatabase;
     private NavController navController;
+    private LayoutInflater layoutInflater;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -56,6 +61,7 @@ public class NotificationsFragment extends Fragment {
         appDatabase = Room.databaseBuilder(requireActivity().getApplicationContext(),
                 AppDatabase.class, AppDatabase.DB_NAME).build();
         navController = Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_activity_main);
+        layoutInflater = (LayoutInflater) requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         return binding.getRoot();
     }
@@ -73,9 +79,7 @@ public class NotificationsFragment extends Fragment {
 
         Disposable disposable = appDatabase.noteDao().getAllNotes()
                 .subscribeOn(Schedulers.io())
-                .subscribe(v -> {
-                  loadData(v);
-                });
+                .subscribe(this::loadData);
     }
 
     @Override
@@ -84,44 +88,81 @@ public class NotificationsFragment extends Fragment {
         binding = null;
     }
 
+    private void handleClick(Uri uri, Note note){
+        Bundle bundle = new Bundle();
+        bundle.putString(ViewMediaFragment.URI, uri.toString());
+        bundle.putInt(ViewMediaFragment.ID, note.getId());
+
+        navController.navigate(R.id.navigation_view_media, bundle);
+    }
+
     private void loadData(List<Note> noteList){
         for(Note note: noteList){
             try {
                 JSONArray urls = new JSONArray(note.getRelated());
 
                 for (int i = 0; i < urls.length(); i++) {
-                    Uri uri = Uri.parse(urls.get(i).toString());
-                    ContentResolver contentResolver = requireContext().getContentResolver();
-                    String type = contentResolver.getType(uri);
+                    final ContentResolver contentResolver = requireActivity().getContentResolver();
+                    final Uri uri = Uri.parse(urls.get(i).toString());
+                    String[] proj = new String[]{MediaStore.Images.ImageColumns.TITLE};
+                    Cursor cursor = contentResolver.query(uri, proj, null, null, null);
+                    View view = null;
 
-                    LayoutInflater layoutInflater = (LayoutInflater) requireContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    if(cursor.moveToNext()){
+                        int titleIdx =
+                                cursor.getColumnIndexOrThrow(MediaStore.Images.ImageColumns.TITLE);
+                        String title = cursor.getString(titleIdx);
 
-                    View.OnClickListener handleClick = view12 -> {
-                        Bundle bundle = new Bundle();
-                        bundle.putString(ViewMediaFragment.URI, uri.toString());
-                        bundle.putInt(ViewMediaFragment.ID, note.getId());
-
-                        navController.navigate(R.id.navigation_view_media, bundle);
-                    };
-
-                    if(type.startsWith("image/")){
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(requireActivity().getContentResolver(), uri);
-                        View image = layoutInflater.inflate(R.layout.image, binding.images, true);
-                        image.setOnClickListener(handleClick);
+                        view = layoutInflater.inflate(R.layout.notification_image, binding.images, false);
 
-                        ImageView imageView = image.findViewById(R.id.image);
+                        ImageView imageView = view.findViewById(R.id.image);
                         imageView.setImageBitmap(bitmap);
+
+                        Log.i(TAG, "The image is found");
+                    } else {
+                        proj = new String[]{MediaStore.Video.VideoColumns.TITLE};
+                        cursor = contentResolver.query(uri, proj, null, null, null);
+
+                        if(cursor.moveToNext()){
+                            view = layoutInflater.inflate(R.layout.notification_video, binding.images, true);
+
+                            VideoView videoView = view.findViewById(R.id.video);
+                            videoView.setVideoURI(uri);
+
+                            Log.i(TAG, "The video is found");
+                        }
                     }
 
-                    if(type.startsWith("video/")){
-                        View view1 = layoutInflater.inflate(R.layout.video, binding.images, true);
-                        view1.setOnClickListener(handleClick);
 
-                        VideoView videoView = view1.findViewById(R.id.video);
-                        videoView.setVideoURI(uri);
+                    final View finalView = view;
+
+                    if(finalView != null){
+                        requireView().post(() -> {
+                            Button viewMedia = finalView.findViewById(R.id.view_media);
+                            Button viewNote = finalView.findViewById(R.id.view_note);
+
+                            viewMedia.setOnClickListener((v) -> handleClick(uri, note));
+                            viewNote.setOnClickListener((v) -> {
+                                Bundle bundle = new Bundle();
+                                bundle.putInt(ViewNoteFragment.KEY, note.getId());
+
+                                navController.navigate(R.id.navigation_view_note, bundle);
+                            });
+
+                            binding.images.addView(finalView);
+                            binding.images.requestLayout();
+                            binding.images.invalidate();
+
+                            noResults.set(false);
+                            Log.i(TAG, "The view is added");
+                        });
+                    } else {
+                        Toast.makeText(requireContext(), "The media is not founded", Toast.LENGTH_LONG)
+                                .show();
                     }
 
-                    noResults.set(false);
+                    cursor.close();
                 }
             } catch (JSONException | IOException e) {
                 e.printStackTrace();

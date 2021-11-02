@@ -144,8 +144,13 @@ public class AddNoteFragment extends Fragment {
             View.OnClickListener handleClick = v -> {
                 if(view != null){
                     imagesUrl.remove(index);
+
                     fragmentAddNoteBinding.images.removeView(view);
                     fragmentAddNoteBinding.images.invalidate();
+
+                    if(imagesUrl.size() == 0){
+                        hasImages.set(false);
+                    }
                 }
             };
 
@@ -171,7 +176,7 @@ public class AddNoteFragment extends Fragment {
             if(view != null && !message.isEmpty()){
                 Button button = view.findViewById(R.id.delete_btn);
                 button.setOnClickListener(handleClick);
-                imagesUrl.add(index, uri.getPath());
+                imagesUrl.add(index, uri.toString());
 
                 hasImages.set(true);
 

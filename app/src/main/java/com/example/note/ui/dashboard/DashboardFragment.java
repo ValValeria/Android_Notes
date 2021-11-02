@@ -54,9 +54,26 @@ public class DashboardFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull @NotNull View view, @Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onStart() {
+        super.onStart();
 
+        loadData();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+
+        noResults.set(true);
+        notes.clear();
+        noteIds.clear();
+
+        linearLayout.removeAllViews();
+        linearLayout.requestLayout();
+        linearLayout.invalidate();
+    }
+
+    private void loadData(){
         AsyncTask.execute(() -> {
             List<Note> noteList = appDatabase.noteDao().getAll();
 
@@ -68,8 +85,8 @@ public class DashboardFragment extends Fragment {
             }
 
             if(notes.size() > 0){
-              view.post(DashboardFragment.this::addViews);
-              noResults.set(false);
+                requireView().post(DashboardFragment.this::addViews);
+                noResults.set(false);
             }
         });
     }

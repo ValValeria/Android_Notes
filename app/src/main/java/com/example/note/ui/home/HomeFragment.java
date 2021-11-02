@@ -97,8 +97,10 @@ public class HomeFragment extends Fragment {
             navController.navigate(R.id.navigation_view_note, bundle);
         });
 
-        linearLayout.addView(view);
-        linearLayout.invalidate();
-        linearLayout.requestLayout();
+        requireActivity().runOnUiThread(() -> {
+            linearLayout.addView(view);
+            linearLayout.invalidate();
+            linearLayout.requestLayout();
+        });
     }
 }
